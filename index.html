@@ -191,6 +191,40 @@ function renderEntries(){
     return;
   }
 
+  let html = '<table><thead><tr>';
+  html += '<th>Date</th><th>Shift</th><th>Staff</th>';
+  html += '<th>Litres</th><th>Sales</th><th>Collection</th>';
+  html += '<th>Difference</th><th></th></tr></thead><tbody>';
+
+  shifts.forEach(s => {
+    html += '<tr>';
+    html += '<td>' + (s.date || '') + '</td>';
+    html += '<td>' + (s.shift || '') + '</td>';
+    html += '<td>' + (s.staffName || '') + '</td>';
+    html += '<td>P ' + Number(s.petrolLitres || 0).toFixed(2) +
+            '<br>D ' + Number(s.dieselLitres || 0).toFixed(2) + '</td>';
+    html += '<td>' + money(s.totalSales) + '</td>';
+    html += '<td>' + money(s.totalCollection) + '</td>';
+    html += '<td>' + money(s.difference) + '</td>';
+    html += '<td>';
+
+    if (profile.role === "owner") {
+      html += '<button class="danger" data-delete-id="' + s.id + '">Delete</button>';
+    }
+
+    html += '</td></tr>';
+  });
+
+  html += '</tbody></table>';
+  box.innerHTML = html;
+
+  box.querySelectorAll("[data-delete-id]").forEach(button => {
+    button.addEventListener("click", () => {
+      window.deleteShift(button.dataset.deleteId);
+    });
+  });
+}
+
   let html = `
     <table>
       <thead>
