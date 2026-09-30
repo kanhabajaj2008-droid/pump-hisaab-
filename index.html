@@ -1,341 +1,1401 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#111827">
-<link rel="manifest" href="manifest.json">
-<title>Pump Manager</title>
-<style>
-:root{font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;color:#111827;background:#f3f4f6}
-*{box-sizing:border-box}body{margin:0}.hidden{display:none!important}
-header{background:#111827;color:white;padding:14px 18px;position:sticky;top:0;z-index:5}
-.wrap{max-width:1200px;margin:auto;padding:16px}.bar{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
-nav{display:flex;gap:8px;overflow:auto;padding:10px 0}button,.btn,select,input,textarea{font:inherit}
-button,.btn{border:0;border-radius:9px;padding:10px 13px;cursor:pointer;background:#2563eb;color:#fff}
-button.secondary,.btn.secondary{background:#e5e7eb;color:#111827}button.danger{background:#dc2626}
-.card{background:white;border-radius:14px;padding:16px;box-shadow:0 2px 10px #00000010;margin-bottom:14px}
-.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
-.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-label{display:block;font-size:13px;font-weight:600;margin-bottom:5px}input,select,textarea{width:100%;padding:10px;border:1px solid #d1d5db;border-radius:8px;background:#fff}
-textarea{min-height:80px;resize:vertical}.stat{font-size:25px;font-weight:700}.muted{color:#6b7280;font-size:13px}
-table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:9px;border-bottom:1px solid #e5e7eb;text-align:left;vertical-align:top}
-.login{min-height:100vh;display:grid;place-items:center;padding:20px}.login .card{width:min(430px,100%)}
-.badge{display:inline-block;padding:4px 8px;border-radius:999px;background:#e5e7eb;font-size:12px}
-@media(max-width:800px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.grid2{grid-template-columns:1fr}table{display:block;overflow:auto;white-space:nowrap}}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#111827">
+  <link rel="manifest" href="manifest.json">
+  <title>Pump Hisaab</title>
+
+  <style>
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Arial,Helvetica,sans-serif;
+      background:#f3f4f6;
+      color:#111827;
+    }
+    button,input,select{font:inherit}
+    button{cursor:pointer}
+
+    .login-page{
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:20px;
+      background:#111827;
+    }
+
+    .login-box{
+      width:100%;
+      max-width:400px;
+      background:white;
+      padding:30px;
+      border-radius:16px;
+      box-shadow:0 20px 50px rgba(0,0,0,.25);
+    }
+
+    .login-box h1{margin-top:0}
+    .login-box p{color:#6b7280}
+
+    .field{margin-bottom:15px}
+    .field label{
+      display:block;
+      margin-bottom:6px;
+      font-weight:bold;
+    }
+
+    input,select{
+      width:100%;
+      padding:11px;
+      border:1px solid #d1d5db;
+      border-radius:8px;
+      background:white;
+    }
+
+    .primary{
+      width:100%;
+      padding:12px;
+      border:0;
+      border-radius:8px;
+      background:#111827;
+      color:white;
+      font-weight:bold;
+    }
+
+    .danger{
+      background:#dc2626;
+      color:white;
+      border:0;
+      padding:7px 10px;
+      border-radius:6px;
+    }
+
+    .secondary{
+      background:#e5e7eb;
+      border:0;
+      padding:9px 12px;
+      border-radius:7px;
+    }
+
+    .hidden{display:none!important}
+
+    .app{
+      min-height:100vh;
+      display:flex;
+    }
+
+    .sidebar{
+      width:240px;
+      background:#111827;
+      color:white;
+      padding:20px;
+      position:fixed;
+      top:0;
+      bottom:0;
+      left:0;
+    }
+
+    .sidebar h2{
+      margin-top:0;
+      margin-bottom:5px;
+    }
+
+    .sidebar small{
+      color:#9ca3af;
+    }
+
+    .nav{
+      margin-top:25px;
+    }
+
+    .nav button{
+      width:100%;
+      text-align:left;
+      margin-bottom:8px;
+      padding:11px;
+      border:0;
+      border-radius:7px;
+      background:transparent;
+      color:white;
+    }
+
+    .nav button:hover{
+      background:#374151;
+    }
+
+    .main{
+      margin-left:240px;
+      width:calc(100% - 240px);
+      padding:25px;
+    }
+
+    .topbar{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:15px;
+      margin-bottom:20px;
+    }
+
+    .cards{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+      gap:15px;
+      margin-bottom:20px;
+    }
+
+    .card{
+      background:white;
+      padding:18px;
+      border-radius:12px;
+      box-shadow:0 2px 8px rgba(0,0,0,.06);
+    }
+
+    .card small{
+      color:#6b7280;
+    }
+
+    .card strong{
+      display:block;
+      font-size:22px;
+      margin-top:7px;
+    }
+
+    .panel{
+      background:white;
+      padding:20px;
+      border-radius:12px;
+      margin-bottom:20px;
+      box-shadow:0 2px 8px rgba(0,0,0,.06);
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+      gap:15px;
+    }
+
+    .section-title{
+      margin-top:0;
+    }
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+      margin-top:15px;
+    }
+
+    th,td{
+      padding:10px;
+      border-bottom:1px solid #e5e7eb;
+      text-align:left;
+      vertical-align:top;
+    }
+
+    th{
+      background:#f9fafb;
+    }
+
+    .message{
+      margin-top:12px;
+      padding:10px;
+      border-radius:7px;
+      background:#f3f4f6;
+    }
+
+    @media(max-width:700px){
+      .sidebar{
+        width:100%;
+        position:relative;
+        height:auto;
+      }
+
+      .app{
+        display:block;
+      }
+
+      .main{
+        margin-left:0;
+        width:100%;
+        padding:15px;
+      }
+
+      .nav{
+        display:flex;
+        flex-wrap:wrap;
+        gap:6px;
+      }
+
+      .nav button{
+        width:auto;
+      }
+
+      .topbar{
+        align-items:flex-start;
+        flex-direction:column;
+      }
+
+      table{
+        display:block;
+        overflow-x:auto;
+      }
+    }
+  </style>
 </head>
+
 <body>
-<div id="loginView" class="login">
-  <div class="card">
-    <h1>Pump Manager</h1>
-    <p class="muted">BPCL Akshat Filling Station · HPCL Pragati Filling Station</p>
+
+<div id="loginPage" class="login-page">
+  <div class="login-box">
+    <h1>Pump Hisaab</h1>
+    <p>Petrol Pump Management System</p>
+
     <form id="loginForm">
-      <label>Email</label><input id="email" type="email" required>
-      <label style="margin-top:10px">Password</label><input id="password" type="password" required>
-      <button style="width:100%;margin-top:14px">Sign in</button>
-      <p id="loginMsg" class="muted"></p>
+      <div class="field">
+        <label>Email</label>
+        <input id="loginEmail" type="email" required>
+      </div>
+
+      <div class="field">
+        <label>Password</label>
+        <input id="loginPassword" type="password" required>
+      </div>
+
+      <button class="primary" type="submit">Login</button>
     </form>
+
+    <div id="loginMessage" class="message hidden"></div>
   </div>
 </div>
 
-<div id="appView" class="hidden">
-<header><div class="bar"><div><b>Pump Manager</b><div id="userLine" class="muted" style="color:#d1d5db"></div></div><button id="logoutBtn" class="secondary">Logout</button></div></header>
-<div class="wrap">
-  <div class="card bar">
-    <div><label>Pump</label><select id="pumpSelect"></select></div>
-    <div><label>Date</label><input id="dateFilter" type="date"></div>
-  </div>
-  <nav id="nav"></nav>
 
-  <section id="dashboard" class="page">
-    <h2>Dashboard</h2>
-    <div class="grid">
-      <div class="card"><div class="muted">Petrol litres</div><div id="sPetrol" class="stat">0</div></div>
-      <div class="card"><div class="muted">Diesel litres</div><div id="sDiesel" class="stat">0</div></div>
-      <div class="card"><div class="muted">Sales</div><div id="sSales" class="stat">₹0</div></div>
-      <div class="card"><div class="muted">Collection</div><div id="sCollection" class="stat">₹0</div></div>
+<div id="app" class="app hidden">
+
+  <aside class="sidebar">
+    <h2>Pump Hisaab</h2>
+    <small id="userInfo"></small>
+
+    <div class="nav">
+      <button onclick="showPage('dashboard')">Dashboard</button>
+      <button onclick="showPage('entry')">New Shift</button>
+      <button onclick="showPage('entries')">Shift Entries</button>
+      <button onclick="showPage('expenses')">Expenses</button>
+      <button id="usersNav" onclick="showPage('users')">Staff</button>
+      <button onclick="logout()">Logout</button>
     </div>
-    <div class="card"><h3>Recent shifts</h3><div id="recent"></div></div>
-  </section>
+  </aside>
 
-  <section id="shiftPage" class="page hidden">
-    <h2>New Shift</h2>
-    <form id="shiftForm" class="card">
-      <div class="grid2">
-        <div><label>Date</label><input id="fDate" type="date" required></div>
-        <div><label>Shift</label><select id="fShift"><option>Morning</option><option>Evening</option><option>Night</option></select></div>
-        <div><label>Petrol opening meter</label><input id="po" type="number" step="0.01" required></div>
-        <div><label>Petrol closing meter</label><input id="pc" type="number" step="0.01" required></div>
-        <div><label>Diesel opening meter</label><input id="do" type="number" step="0.01" required></div>
-        <div><label>Diesel closing meter</label><input id="dc" type="number" step="0.01" required></div>
-        <div><label>Petrol rate</label><input id="pr" type="number" step="0.01" required></div>
-        <div><label>Diesel rate</label><input id="dr" type="number" step="0.01" required></div>
-        <div><label>Cash</label><input id="cash" type="number" step="0.01" value="0"></div>
-        <div><label>UPI / Online</label><input id="upi" type="number" step="0.01" value="0"></div>
-        <div><label>Card</label><input id="card" type="number" step="0.01" value="0"></div>
-        <div><label>Credit</label><input id="credit" type="number" step="0.01" value="0"></div>
-        <div><label>Other collection</label><input id="other" type="number" step="0.01" value="0"></div>
-        <div><label>Opening cash</label><input id="openingCash" type="number" step="0.01" value="0"></div>
-        <div><label>Expenses during shift</label><input id="expenses" type="number" step="0.01" value="0"></div>
-        <div><label>Actual cash counted</label><input id="actualCash" type="number" step="0.01" value="0"></div>
+
+  <main class="main">
+
+    <div class="topbar">
+      <div>
+        <h1 id="pageTitle">Dashboard</h1>
+        <div id="pumpLabel"></div>
       </div>
-      <label style="margin-top:10px">Notes</label><textarea id="notes"></textarea>
-      <div id="calc" class="card" style="margin-top:12px;background:#f9fafb"></div>
-      <button>Save shift</button>
-      <span id="shiftMsg" class="muted"></span>
-    </form>
-  </section>
 
-  <section id="entriesPage" class="page hidden"><h2>Entries</h2><div class="card"><div id="entries"></div></div></section>
-
-  <section id="expensePage" class="page hidden">
-    <h2>Expenses</h2>
-    <form id="expenseForm" class="card">
-      <div class="grid2">
-        <div><label>Date</label><input id="eDate" type="date" required></div>
-        <div><label>Category</label><input id="eCat" required></div>
-        <div><label>Amount</label><input id="eAmount" type="number" step="0.01" required></div>
-        <div><label>Description</label><input id="eDesc"></div>
+      <div style="min-width:200px">
+        <select id="pumpSelect"></select>
       </div>
-      <button style="margin-top:12px">Add expense</button>
-      <span id="expenseMsg" class="muted"></span>
-    </form>
-    <div class="card"><div id="expensesList"></div></div>
-  </section>
+    </div>
 
-  <section id="reportsPage" class="page hidden"><h2>Reports</h2><div class="card"><button id="csvBtn">Export current pump/date view to CSV</button><div id="reportBox" style="margin-top:12px"></div></div></section>
 
-  <section id="staffPage" class="page hidden"><h2>Staff & Users</h2><div class="card"><p class="muted">Create authentication users in Firebase Authentication, then create their matching document in the root <b>users</b> collection using the Firebase UID as the document ID.</p><div id="usersList"></div></div></section>
+    <!-- DASHBOARD -->
 
-  <section id="auditPage" class="page hidden"><h2>Audit Log</h2><div class="card"><div id="auditList"></div></div></section>
+    <section id="page-dashboard">
+
+      <div class="cards">
+        <div class="card">
+          <small>Total Petrol</small>
+          <strong id="dashPetrol">0 L</strong>
+        </div>
+
+        <div class="card">
+          <small>Total Diesel</small>
+          <strong id="dashDiesel">0 L</strong>
+        </div>
+
+        <div class="card">
+          <small>Total Sales</small>
+          <strong id="dashSales">₹0</strong>
+        </div>
+
+        <div class="card">
+          <small>Total Collection</small>
+          <strong id="dashCollection">₹0</strong>
+        </div>
+
+        <div class="card">
+          <small>Total Difference</small>
+          <strong id="dashDifference">₹0</strong>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2 class="section-title">Current Pump</h2>
+        <p id="dashboardPump"></p>
+        <p id="dashboardRole"></p>
+      </div>
+
+    </section>
+
+
+    <!-- NEW SHIFT -->
+
+    <section id="page-entry" class="hidden">
+
+      <div class="panel">
+        <h2 class="section-title">New Shift Entry</h2>
+
+        <form id="shiftForm">
+
+          <div class="grid">
+
+            <div class="field">
+              <label>Date</label>
+              <input id="shiftDate" type="date" required>
+            </div>
+
+            <div class="field">
+              <label>Shift</label>
+              <select id="shiftName">
+                <option>Morning</option>
+                <option>Evening</option>
+                <option>Night</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label>Petrol Opening Meter</label>
+              <input id="petrolOpening" type="number" step="0.01" required>
+            </div>
+
+            <div class="field">
+              <label>Petrol Closing Meter</label>
+              <input id="petrolClosing" type="number" step="0.01" required>
+            </div>
+
+            <div class="field">
+              <label>Petrol Rate</label>
+              <input id="petrolRate" type="number" step="0.01" required>
+            </div>
+
+            <div class="field">
+              <label>Diesel Opening Meter</label>
+              <input id="dieselOpening" type="number" step="0.01" required>
+            </div>
+
+            <div class="field">
+              <label>Diesel Closing Meter</label>
+              <input id="dieselClosing" type="number" step="0.01" required>
+            </div>
+
+            <div class="field">
+              <label>Diesel Rate</label>
+              <input id="dieselRate" type="number" step="0.01" required>
+            </div>
+
+            <div class="field">
+              <label>Cash Collection</label>
+              <input id="cash" type="number" step="0.01" value="0">
+            </div>
+
+            <div class="field">
+              <label>UPI / Online Collection</label>
+              <input id="upi" type="number" step="0.01" value="0">
+            </div>
+
+            <div class="field">
+              <label>Card Collection</label>
+              <input id="card" type="number" step="0.01" value="0">
+            </div>
+
+            <div class="field">
+              <label>Credit / Other Collection</label>
+              <input id="credit" type="number" step="0.01" value="0">
+            </div>
+
+            <div class="field">
+              <label>Expenses</label>
+              <input id="shiftExpenses" type="number" step="0.01" value="0">
+            </div>
+
+          </div>
+
+          <div class="panel">
+            <h3>Calculated Result</h3>
+
+            <div class="cards">
+              <div class="card">
+                <small>Petrol Litres</small>
+                <strong id="calcPetrolLitres">0</strong>
+              </div>
+
+              <div class="card">
+                <small>Diesel Litres</small>
+                <strong id="calcDieselLitres">0</strong>
+              </div>
+
+              <div class="card">
+                <small>Total Sales</small>
+                <strong id="calcSales">₹0</strong>
+              </div>
+
+              <div class="card">
+                <small>Total Collection</small>
+                <strong id="calcCollection">₹0</strong>
+              </div>
+
+              <div class="card">
+                <small>Difference</small>
+                <strong id="calcDifference">₹0</strong>
+              </div>
+            </div>
+          </div>
+
+          <button class="primary" type="submit">Save Shift</button>
+
+          <div id="shiftMessage" class="message hidden"></div>
+
+        </form>
+      </div>
+
+    </section>
+
+
+    <!-- ENTRIES -->
+
+    <section id="page-entries" class="hidden">
+
+      <div class="panel">
+        <h2 class="section-title">Shift Entries</h2>
+        <div id="entries"></div>
+      </div>
+
+    </section>
+
+
+    <!-- EXPENSES -->
+
+    <section id="page-expenses" class="hidden">
+
+      <div class="panel">
+        <h2 class="section-title">Expenses</h2>
+
+        <form id="expenseForm">
+
+          <div class="grid">
+
+            <div class="field">
+              <label>Date</label>
+              <input id="expenseDate" type="date" required>
+            </div>
+
+            <div class="field">
+              <label>Description</label>
+              <input id="expenseDescription" type="text" required>
+            </div>
+
+            <div class="field">
+              <label>Amount</label>
+              <input id="expenseAmount" type="number" step="0.01" required>
+            </div>
+
+          </div>
+
+          <button class="primary" type="submit">Save Expense</button>
+
+        </form>
+
+        <div id="expenseMessage" class="message hidden"></div>
+
+        <div id="expenseList"></div>
+      </div>
+
+    </section>
+
+
+    <!-- USERS -->
+
+    <section id="page-users" class="hidden">
+
+      <div class="panel">
+
+        <h2 class="section-title">Staff Management</h2>
+
+        <p>
+          Staff accounts must first be created in Firebase Authentication.
+          This section stores their pump access and role.
+        </p>
+
+        <div id="userList"></div>
+
+      </div>
+
+    </section>
+
+  </main>
 </div>
-</div>
+
 
 <script type="module">
-import {initializeApp} from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
-import {getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut} from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
-import {getFirestore, collection, doc, getDoc, getDocs, addDoc, query, where, orderBy, limit, serverTimestamp, deleteDoc} from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
-import "./config.js";
 
-const cfg=window.FIREBASE_CONFIG;
-const app=initializeApp(cfg), auth=getAuth(app), db=getFirestore(app);
-const $=id=>document.getElementById(id);
-const money=n=>"₹"+Number(n||0).toLocaleString("en-IN",{maximumFractionDigits:2});
-const num=id=>Number($(id).value||0);
-let me=null, profile=null, pumps=[], shifts=[], expenses=[], users=[];
-let currentPage="dashboard";
+import { initializeApp } from
+"https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
 
-$("dateFilter").value=new Date().toISOString().slice(0,10);
-$("fDate").value=$("dateFilter").value;
-$("eDate").value=$("dateFilter").value;
+import {
+  getAuth,
+  signInWithEmailAndPassword,
+  onAuthStateChanged,
+  signOut
+} from
+"https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
 
-$("loginForm").onsubmit=async e=>{
- e.preventDefault(); $("loginMsg").textContent="Signing in...";
- try{await signInWithEmailAndPassword(auth,$("email").value,$("password").value); $("loginMsg").textContent="";}
- catch(err){$("loginMsg").textContent=err.message;}
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  collection,
+  query,
+  where,
+  getDocs,
+  addDoc,
+  deleteDoc
+} from
+"https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
+
+
+const firebaseConfig = window.FIREBASE_CONFIG;
+
+if (!firebaseConfig || !firebaseConfig.projectId) {
+  document.body.innerHTML =
+    "<h2 style='padding:30px'>Firebase configuration is missing. Check js/config.js.</h2>";
+  throw new Error("Firebase configuration missing");
+}
+
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+
+let profile = null;
+let pumps = [];
+let currentPump = null;
+let shifts = [];
+let expenses = [];
+
+
+const $ = id => document.getElementById(id);
+
+
+function money(value) {
+  return "₹" + Number(value || 0).toLocaleString("en-IN", {
+    maximumFractionDigits: 2
+  });
+}
+
+
+function today() {
+  return new Date().toISOString().slice(0,10);
+}
+
+
+$("shiftDate").value = today();
+$("expenseDate").value = today();
+
+
+function showMessage(id, message) {
+  const box = $(id);
+  box.textContent = message;
+  box.classList.remove("hidden");
+}
+
+
+function hideMessage(id) {
+  $(id).classList.add("hidden");
+}
+
+
+window.showPage = function(page) {
+
+  const pages = [
+    "dashboard",
+    "entry",
+    "entries",
+    "expenses",
+    "users"
+  ];
+
+  pages.forEach(name => {
+    $("page-" + name).classList.add("hidden");
+  });
+
+  $("page-" + page).classList.remove("hidden");
+
+  const titles = {
+    dashboard: "Dashboard",
+    entry: "New Shift",
+    entries: "Shift Entries",
+    expenses: "Expenses",
+    users: "Staff"
+  };
+
+  $("pageTitle").textContent = titles[page] || "Dashboard";
+
+  if (page === "entries") {
+    renderEntries();
+  }
+
+  if (page === "expenses") {
+    renderExpenses();
+  }
+
+  if (page === "users") {
+    renderUsers();
+  }
 };
-$("logoutBtn").onclick=()=>signOut(auth);
-$("dateFilter").onchange=()=>loadData();
 
-function moneyCell(n){return money(n)}
-function selectedPump(){return $("pumpSelect").value}
-function accessiblePumpIds(){return profile.role==="owner"?pumps.map(p=>p.id):profile.pumpAccess||[]}
 
-async function loadProfile(){
- const snap=await getDoc(doc(db,"users",me.uid));
- if(!snap.exists()) throw new Error("No user profile found in Firestore for this Firebase UID.");
- profile={id:snap.id,...snap.data()};
- const ps=await getDocs(collection(db,"pumps"));
- pumps=ps.docs.map(d=>({id:d.id,...d.data()})).filter(p=>p.active!==false);
- const allowed=accessiblePumpIds();
- pumps=pumps.filter(p=>allowed.includes(p.id)||profile.role==="owner");
- $("userLine").textContent=`${profile.name||profile.email||me.email} · ${profile.role}`;
- $("pumpSelect").innerHTML=pumps.map(p=>`<option value="${p.id}">${p.company||""} — ${p.name||p.id}</option>`).join("");
- if(!pumps.length) throw new Error("No pump access assigned to this user.");
- renderNav(); await loadData();
-}
-function renderNav(){
- const items=[["dashboard","Dashboard"],["shiftPage","New Shift"],["entriesPage","Entries"],["expensePage","Expenses"],["reportsPage","Reports"]];
- if(profile.role==="owner") items.push(["staffPage","Staff"],["auditPage","Audit"]);
- $("nav").innerHTML=items.map(([id,label])=>`<button class="${id==="dashboard"?"":"secondary"}" data-page="${id}">${label}</button>`).join("");
- $("nav").querySelectorAll("button").forEach(b=>b.onclick=()=>showPage(b.dataset.page));
-}
-function showPage(id){
- currentPage=id; document.querySelectorAll(".page").forEach(x=>x.classList.add("hidden")); $(id).classList.remove("hidden");
- loadData();
-}
-async function loadData(){
- const pid=selectedPump(); if(!pid||!profile)return;
- const qs=await getDocs(query(collection(db,"shifts"),where("pumpId","==",pid),orderBy("createdAt","desc"),limit(300)));
- shifts=qs.docs.map(d=>({id:d.id,...d.data()})).filter(x=>!x.deleted);
- const es=await getDocs(query(collection(db,"expenses"),where("pumpId","==",pid),orderBy("createdAt","desc"),limit(300)));
- expenses=es.docs.map(d=>({id:d.id,...d.data()})).filter(x=>!x.deleted);
- renderDashboard(); renderEntries(); renderExpenses(); renderReport();
- if(profile.role==="owner"){const us=await getDocs(collection(db,"users"));users=us.docs.map(d=>({id:d.id,...d.data()}));renderUsers();
- const al=await getDocs(query(collection(db,"audit_logs"),orderBy("createdAt","desc"),limit(100)));renderAudit(al.docs.map(d=>({id:d.id,...d.data()})));}
-}
-function renderDashboard(){
- const total=k=>shifts.reduce((a,s)=>a+Number(s[k]||0),0);
- $("sPetrol").textContent=total("petrolLitres").toFixed(2);
- $("sDiesel").textContent=total("dieselLitres").toFixed(2);
- $("sSales").textContent=money(total("totalSales"));
- $("sCollection").textContent=money(total("totalCollection"));
- $("recent").innerHTML=shifts.slice(0,10).map(s=>`<div style="padding:8px 0;border-bottom:1px solid #eee"><b>${s.date||""} · ${s.shift||""}</b> — ${money(s.totalSales)} — ${s.staffName||""}</div>`).join("")||"No entries yet.";
-}
-function renderEntries(){
-  const box = $("entries");
+async function loadProfile() {
 
-  if (!shifts.length) {
-    box.textContent = "No shifts.";
+  if (!auth.currentUser) {
+    return false;
+  }
+
+  const ref = doc(db, "users", auth.currentUser.uid);
+  const snap = await getDoc(ref);
+
+  if (!snap.exists()) {
+    throw new Error("Your Firebase user profile was not found in Firestore.");
+  }
+
+  profile = snap.data();
+
+  if (profile.active === false) {
+    throw new Error("This account is inactive.");
+  }
+
+  return true;
+}
+
+
+async function loadPumps() {
+
+  const snap = await getDocs(collection(db, "pumps"));
+
+  pumps = [];
+
+  snap.forEach(item => {
+    const data = item.data();
+
+    if (data.active !== false &&
+        profile.pumpAccess &&
+        profile.pumpAccess.includes(item.id)) {
+
+      pumps.push({
+        id: item.id,
+        ...data
+      });
+    }
+  });
+
+  if (!pumps.length) {
+    throw new Error("No pump has been assigned to this account.");
+  }
+
+  currentPump = pumps[0];
+
+  $("pumpSelect").innerHTML = "";
+
+  pumps.forEach(pump => {
+
+    const option = document.createElement("option");
+    option.value = pump.id;
+    option.textContent =
+      pump.company + " - " + pump.name;
+
+    $("pumpSelect").appendChild(option);
+
+  });
+
+  $("pumpSelect").value = currentPump.id;
+
+  updatePumpDisplay();
+}
+
+
+function updatePumpDisplay() {
+
+  $("pumpLabel").textContent =
+    currentPump.company + " - " + currentPump.name;
+
+  $("dashboardPump").textContent =
+    "Pump: " + currentPump.company + " - " + currentPump.name;
+
+  $("dashboardRole").textContent =
+    "Login: " + profile.name + " (" + profile.role + ")";
+}
+
+
+$("pumpSelect").addEventListener("change", async function() {
+
+  const found = pumps.find(p => p.id === this.value);
+
+  if (!found) {
     return;
   }
 
-  let html = '<table><thead><tr>';
-  html += '<th>Date</th><th>Shift</th><th>Staff</th>';
-  html += '<th>Litres</th><th>Sales</th><th>Collection</th>';
-  html += '<th>Difference</th><th></th></tr></thead><tbody>';
+  currentPump = found;
 
-  shifts.forEach(s => {
-    html += '<tr>';
-    html += '<td>' + (s.date || '') + '</td>';
-    html += '<td>' + (s.shift || '') + '</td>';
-    html += '<td>' + (s.staffName || '') + '</td>';
-    html += '<td>P ' + Number(s.petrolLitres || 0).toFixed(2) +
-            '<br>D ' + Number(s.dieselLitres || 0).toFixed(2) + '</td>';
-    html += '<td>' + money(s.totalSales) + '</td>';
-    html += '<td>' + money(s.totalCollection) + '</td>';
-    html += '<td>' + money(s.difference) + '</td>';
-    html += '<td>';
+  updatePumpDisplay();
 
-    if (profile.role === "owner") {
-      html += '<button class="danger" data-delete-id="' + s.id + '">Delete</button>';
-    }
+  await loadData();
 
-    html += '</td></tr>';
-  });
-
-  html += '</tbody></table>';
-  box.innerHTML = html;
-
-  box.querySelectorAll("[data-delete-id]").forEach(button => {
-    button.addEventListener("click", () => {
-      window.deleteShift(button.dataset.deleteId);
-    });
-  });
-}
-
-  let html = `
-    <table>
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Shift</th>
-          <th>Staff</th>
-          <th>Litres</th>
-          <th>Sales</th>
-          <th>Collection</th>
-          <th>Difference</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-  `;
-
-  shifts.forEach(s => {
-    let deleteButton = "";
-
-    if (profile.role === "owner") {
-      deleteButton =
-        '<button class="danger" onclick="window.deleteShift(\\'' +
-        s.id +
-        '\\')">Delete</button>';
-    }
-
-    html += `
-      <tr>
-        <td>${s.date || ""}</td>
-        <td>${s.shift || ""}</td>
-        <td>${s.staffName || ""}</td>
-        <td>
-          P ${Number(s.petrolLitres || 0).toFixed(2)}<br>
-          D ${Number(s.dieselLitres || 0).toFixed(2)}
-        </td>
-        <td>${money(s.totalSales)}</td>
-        <td>${money(s.totalCollection)}</td>
-        <td>${money(s.difference)}</td>
-        <td>${deleteButton}</td>
-      </tr>
-    `;
-  });
-
-  html += `
-      </tbody>
-    </table>
-  `;
-
-  box.innerHTML = html;
-}
-window.deleteShift=async id=>{
- if(profile.role!=="owner"||!confirm("Delete this shift?"))return;
- await deleteDoc(doc(db,"shifts",id)); await addDoc(collection(db,"audit_logs"),{action:"delete",entity:"shift",entityId:id,userId:me.uid,userName:profile.name||me.email,pumpId:selectedPump(),details:"Owner deleted shift",createdAt:serverTimestamp()}); loadData();
-}
-function renderExpenses(){
- $("expensesList").innerHTML=expenses.length?`<table><thead><tr><th>Date</th><th>Category</th><th>Amount</th><th>Description</th><th>Staff</th></tr></thead><tbody>`+
- expenses.map(e=>`<tr><td>${e.date||""}</td><td>${e.category||""}</td><td>${money(e.amount)}</td><td>${e.description||""}</td><td>${e.staffName||""}</td></tr>`).join("")+"</tbody></table>`:"No expenses.";
-}
-function renderUsers(){
- $("usersList").innerHTML=users.map(u=>`<div style="padding:9px 0;border-bottom:1px solid #eee"><b>${u.name||u.email||u.id}</b> <span class="badge">${u.role||""}</span> <span class="muted">${(u.pumpAccess||[]).join(", ")}</span></div>`).join("");
-}
-function renderAudit(a){
- $("auditList").innerHTML=a.length?`<table><thead><tr><th>Time</th><th>Action</th><th>Entity</th><th>User</th><th>Pump</th><th>Details</th></tr></thead><tbody>`+
- a.map(x=>`<tr><td>${x.createdAt?.toDate?x.createdAt.toDate().toLocaleString():''}</td><td>${x.action||""}</td><td>${x.entity||""}</td><td>${x.userName||""}</td><td>${x.pumpId||""}</td><td>${x.details||""}</td></tr>`).join("")+"</tbody></table>`:"No audit entries.";
-}
-function renderReport(){
- const sales=shifts.reduce((a,s)=>a+Number(s.totalSales||0),0), col=shifts.reduce((a,s)=>a+Number(s.totalCollection||0),0);
- $("reportBox").innerHTML=`<b>${selectedPump()}</b><br>Shifts: ${shifts.length}<br>Sales: ${money(sales)}<br>Collection: ${money(col)}<br>Difference: ${money(sales-col)}<br>Expenses: ${money(expenses.reduce((a,e)=>a+Number(e.amount||0),0))}`;
-}
-function updateCalc(){
- const petrol=Math.max(0,num("pc")-num("po")), diesel=Math.max(0,num("dc")-num("do"));
- const ps=petrol*num("pr"), ds=diesel*num("dr"), sales=ps+ds;
- const collection=num("cash")+num("upi")+num("card")+num("credit")+num("other");
- const difference=sales-collection, expectedCash=num("openingCash")+num("cash")-num("expenses"), cashDiff=num("actualCash")-expectedCash;
- $("calc").innerHTML=`Petrol litres: <b>${petrol.toFixed(2)}</b> · Diesel litres: <b>${diesel.toFixed(2)}</b><br>Petrol sales: <b>${money(ps)}</b> · Diesel sales: <b>${money(ds)}</b><br>Total sales: <b>${money(sales)}</b> · Collection: <b>${money(collection)}</b> · Difference: <b>${money(difference)}</b><br>Expected cash: <b>${money(expectedCash)}</b> · Cash difference: <b>${money(cashDiff)}</b>`;
-}
-["po","pc","do","dc","pr","dr","cash","upi","card","credit","other","openingCash","expenses","actualCash"].forEach(id=>$(id).oninput=updateCalc);
-$("shiftForm").onsubmit=async e=>{
- e.preventDefault(); const pid=selectedPump();
- const petrol=Math.max(0,num("pc")-num("po")), diesel=Math.max(0,num("dc")-num("do"));
- const petrolSales=petrol*num("pr"), dieselSales=diesel*num("dr"), totalSales=petrolSales+dieselSales;
- const totalCollection=num("cash")+num("upi")+num("card")+num("credit")+num("other");
- const expectedCash=num("openingCash")+num("cash")-num("expenses");
- const actual=num("actualCash");
- const data={pumpId:pid,date:$("fDate").value,shift:$("fShift").value,staffId:me.uid,staffName:profile.name||me.email,
- petrolOpening:num("po"),petrolClosing:num("pc"),dieselOpening:num("do"),dieselClosing:num("dc"),petrolRate:num("pr"),dieselRate:num("dr"),
- petrolLitres:petrol,dieselLitres:diesel,petrolSales,dieselSales,totalSales,cash:num("cash"),upi:num("upi"),card:num("card"),credit:num("credit"),otherCollection:num("other"),
- totalCollection,difference:totalSales-totalCollection,openingCash:num("openingCash"),expenses:num("expenses"),expectedCash,actualCash:actual,cashDifference:actual-expectedCash,
- notes:$("notes").value,status:"submitted",deleted:false,createdAt:serverTimestamp(),updatedAt:serverTimestamp()};
- const ref=await addDoc(collection(db,"shifts"),data);
- await addDoc(collection(db,"audit_logs"),{action:"create",entity:"shift",entityId:ref.id,userId:me.uid,userName:profile.name||me.email,pumpId:pid,details:"Shift created",createdAt:serverTimestamp()});
- $("shiftMsg").textContent="Shift saved successfully."; e.target.reset(); $("fDate").value=$("dateFilter").value; updateCalc(); await loadData();
-};
-$("expenseForm").onsubmit=async e=>{
- e.preventDefault(); const pid=selectedPump(); const data={pumpId:pid,date:$("eDate").value,category:$("eCat").value,amount:Number($("eAmount").value),description:$("eDesc").value,staffId:me.uid,staffName:profile.name||me.email,deleted:false,createdAt:serverTimestamp()};
- const ref=await addDoc(collection(db,"expenses"),data); await addDoc(collection(db,"audit_logs"),{action:"create",entity:"expense",entityId:ref.id,userId:me.uid,userName:profile.name||me.email,pumpId:pid,details:"Expense created",createdAt:serverTimestamp()});
- $("expenseMsg").textContent="Expense saved."; e.target.reset(); $("eDate").value=$("dateFilter").value; await loadData();
-};
-$("pumpSelect").onchange=loadData;
-$("csvBtn").onclick=()=>{
- const rows=[["Date","Shift","Staff","Petrol Litres","Diesel Litres","Sales","Collection","Difference"],...shifts.map(s=>[s.date,s.shift,s.staffName,s.petrolLitres,s.dieselLitres,s.totalSales,s.totalCollection,s.difference])];
- const csv=rows.map(r=>r.map(v=>`"${String(v??"").replaceAll('"','""')}"`).join(",")).join("\n");
- const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));a.download=`pump-${selectedPump()}-${$("dateFilter").value||"report"}.csv`;a.click();
-};
-onAuthStateChanged(auth,async user=>{
- if(!user){$("loginView").classList.remove("hidden");$("appView").classList.add("hidden");return;}
- try{me=user;await loadProfile();$("loginView").classList.add("hidden");$("appView").classList.remove("hidden");}
- catch(err){$("loginView").classList.remove("hidden");$("appView").classList.add("hidden");$("loginMsg").textContent=err.message;}
 });
-if("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(()=>{});
+
+
+async function loadData() {
+
+  if (!currentPump) {
+    return;
+  }
+
+  const shiftQuery = query(
+    collection(db, "shifts"),
+    where("pumpId", "==", currentPump.id)
+  );
+
+  const shiftSnap = await getDocs(shiftQuery);
+
+  shifts = [];
+
+  shiftSnap.forEach(item => {
+
+    shifts.push({
+      id: item.id,
+      ...item.data()
+    });
+
+  });
+
+  shifts.sort((a,b) => {
+    return String(b.date || "").localeCompare(
+      String(a.date || "")
+    );
+  });
+
+
+  const expenseQuery = query(
+    collection(db, "expenses"),
+    where("pumpId", "==", currentPump.id)
+  );
+
+  const expenseSnap = await getDocs(expenseQuery);
+
+  expenses = [];
+
+  expenseSnap.forEach(item => {
+
+    expenses.push({
+      id: item.id,
+      ...item.data()
+    });
+
+  });
+
+  expenses.sort((a,b) => {
+    return String(b.date || "").localeCompare(
+      String(a.date || "")
+    );
+  });
+
+
+  renderDashboard();
+  renderEntries();
+  renderExpenses();
+
+}
+
+
+function renderDashboard() {
+
+  let petrol = 0;
+  let diesel = 0;
+  let sales = 0;
+  let collection = 0;
+  let difference = 0;
+
+  shifts.forEach(s => {
+
+    petrol += Number(s.petrolLitres || 0);
+    diesel += Number(s.dieselLitres || 0);
+    sales += Number(s.totalSales || 0);
+    collection += Number(s.totalCollection || 0);
+    difference += Number(s.difference || 0);
+
+  });
+
+  $("dashPetrol").textContent =
+    petrol.toFixed(2) + " L";
+
+  $("dashDiesel").textContent =
+    diesel.toFixed(2) + " L";
+
+  $("dashSales").textContent =
+    money(sales);
+
+  $("dashCollection").textContent =
+    money(collection);
+
+  $("dashDifference").textContent =
+    money(difference);
+
+}
+
+
+function renderEntries() {
+
+  const box = $("entries");
+
+  box.innerHTML = "";
+
+  if (!shifts.length) {
+
+    box.textContent = "No shifts found.";
+
+    return;
+  }
+
+
+  const table = document.createElement("table");
+
+  const head = document.createElement("thead");
+
+  head.innerHTML =
+    "<tr>" +
+    "<th>Date</th>" +
+    "<th>Shift</th>" +
+    "<th>Staff</th>" +
+    "<th>Petrol</th>" +
+    "<th>Diesel</th>" +
+    "<th>Sales</th>" +
+    "<th>Collection</th>" +
+    "<th>Difference</th>" +
+    "<th>Action</th>" +
+    "</tr>";
+
+  table.appendChild(head);
+
+
+  const body = document.createElement("tbody");
+
+
+  shifts.forEach(s => {
+
+    const row = document.createElement("tr");
+
+    row.innerHTML =
+      "<td>" + (s.date || "") + "</td>" +
+      "<td>" + (s.shift || "") + "</td>" +
+      "<td>" + (s.staffName || "") + "</td>" +
+      "<td>" + Number(s.petrolLitres || 0).toFixed(2) + " L</td>" +
+      "<td>" + Number(s.dieselLitres || 0).toFixed(2) + " L</td>" +
+      "<td>" + money(s.totalSales) + "</td>" +
+      "<td>" + money(s.totalCollection) + "</td>" +
+      "<td>" + money(s.difference) + "</td>";
+
+    const action = document.createElement("td");
+
+
+    if (profile.role === "owner") {
+
+      const button = document.createElement("button");
+
+      button.className = "danger";
+      button.textContent = "Delete";
+
+      button.addEventListener("click", async function() {
+
+        if (!confirm("Delete this shift?")) {
+          return;
+        }
+
+        await deleteDoc(doc(db, "shifts", s.id));
+
+        await loadData();
+
+      });
+
+      action.appendChild(button);
+
+    }
+
+
+    row.appendChild(action);
+    body.appendChild(row);
+
+  });
+
+
+  table.appendChild(body);
+  box.appendChild(table);
+
+}
+
+
+function renderExpenses() {
+
+  const box = $("expenseList");
+
+  box.innerHTML = "";
+
+  if (!expenses.length) {
+
+    box.textContent = "No expenses found.";
+
+    return;
+  }
+
+
+  const table = document.createElement("table");
+
+  table.innerHTML =
+    "<thead>" +
+    "<tr>" +
+    "<th>Date</th>" +
+    "<th>Description</th>" +
+    "<th>Amount</th>" +
+    "<th>Staff</th>" +
+    "</tr>" +
+    "</thead>";
+
+
+  const body = document.createElement("tbody");
+
+
+  expenses.forEach(e => {
+
+    const row = document.createElement("tr");
+
+    row.innerHTML =
+      "<td>" + (e.date || "") + "</td>" +
+      "<td>" + (e.description || "") + "</td>" +
+      "<td>" + money(e.amount) + "</td>" +
+      "<td>" + (e.staffName || "") + "</td>";
+
+    body.appendChild(row);
+
+  });
+
+
+  table.appendChild(body);
+  box.appendChild(table);
+
+}
+
+
+function renderUsers() {
+
+  const box = $("userList");
+
+  if (profile.role !== "owner") {
+
+    box.textContent =
+      "Only the owner can view staff management.";
+
+    return;
+  }
+
+  box.textContent =
+    "Staff profiles are managed through the Firestore users collection.";
+
+}
+
+
+function calculateShift() {
+
+  const petrolOpening =
+    Number($("petrolOpening").value || 0);
+
+  const petrolClosing =
+    Number($("petrolClosing").value || 0);
+
+  const petrolRate =
+    Number($("petrolRate").value || 0);
+
+
+  const dieselOpening =
+    Number($("dieselOpening").value || 0);
+
+  const dieselClosing =
+    Number($("dieselClosing").value || 0);
+
+  const dieselRate =
+    Number($("dieselRate").value || 0);
+
+
+  const petrolLitres =
+    Math.max(0, petrolClosing - petrolOpening);
+
+  const dieselLitres =
+    Math.max(0, dieselClosing - dieselOpening);
+
+
+  const petrolSales =
+    petrolLitres * petrolRate;
+
+  const dieselSales =
+    dieselLitres * dieselRate;
+
+
+  const totalSales =
+    petrolSales + dieselSales;
+
+
+  const cash =
+    Number($("cash").value || 0);
+
+  const upi =
+    Number($("upi").value || 0);
+
+  const card =
+    Number($("card").value || 0);
+
+  const credit =
+    Number($("credit").value || 0);
+
+
+  const totalCollection =
+    cash + upi + card + credit;
+
+
+  const difference =
+    totalCollection - totalSales;
+
+
+  $("calcPetrolLitres").textContent =
+    petrolLitres.toFixed(2);
+
+  $("calcDieselLitres").textContent =
+    dieselLitres.toFixed(2);
+
+  $("calcSales").textContent =
+    money(totalSales);
+
+  $("calcCollection").textContent =
+    money(totalCollection);
+
+  $("calcDifference").textContent =
+    money(difference);
+
+
+  return {
+    petrolLitres,
+    dieselLitres,
+    totalSales,
+    totalCollection,
+    difference
+  };
+
+}
+
+
+[
+  "petrolOpening",
+  "petrolClosing",
+  "petrolRate",
+  "dieselOpening",
+  "dieselClosing",
+  "dieselRate",
+  "cash",
+  "upi",
+  "card",
+  "credit"
+].forEach(id => {
+
+  $(id).addEventListener("input", calculateShift);
+
+});
+
+
+$("shiftForm").addEventListener("submit", async function(event) {
+
+  event.preventDefault();
+
+  hideMessage("shiftMessage");
+
+
+  try {
+
+    const result = calculateShift();
+
+    const expense =
+      Number($("shiftExpenses").value || 0);
+
+
+    const data = {
+
+      pumpId: currentPump.id,
+
+      pumpName: currentPump.name,
+
+      pumpCompany: currentPump.company,
+
+      date: $("shiftDate").value,
+
+      shift: $("shiftName").value,
+
+      petrolOpening:
+        Number($("petrolOpening").value || 0),
+
+      petrolClosing:
+        Number($("petrolClosing").value || 0),
+
+      dieselOpening:
+        Number($("dieselOpening").value || 0),
+
+      dieselClosing:
+        Number($("dieselClosing").value || 0),
+
+      petrolRate:
+        Number($("petrolRate").value || 0),
+
+      dieselRate:
+        Number($("dieselRate").value || 0),
+
+      petrolLitres:
+        result.petrolLitres,
+
+      dieselLitres:
+        result.dieselLitres,
+
+      totalSales:
+        result.totalSales,
+
+      cash:
+        Number($("cash").value || 0),
+
+      upi:
+        Number($("upi").value || 0),
+
+      card:
+        Number($("card").value || 0),
+
+      credit:
+        Number($("credit").value || 0),
+
+      totalCollection:
+        result.totalCollection,
+
+      difference:
+        result.difference,
+
+      expenses:
+        expense,
+
+      staffId:
+        auth.currentUser.uid,
+
+      staffName:
+        profile.name || auth.currentUser.email,
+
+      createdAt:
+        new Date().toISOString()
+
+    };
+
+
+    await addDoc(
+      collection(db, "shifts"),
+      data
+    );
+
+
+    showMessage(
+      "shiftMessage",
+      "Shift saved successfully."
+    );
+
+
+    $("shiftForm").reset();
+
+    $("shiftDate").value = today();
+
+    calculateShift();
+
+    await loadData();
+
+  } catch(error) {
+
+    console.error(error);
+
+    showMessage(
+      "shiftMessage",
+      error.message
+    );
+
+  }
+
+});
+
+
+$("expenseForm").addEventListener("submit", async function(event) {
+
+  event.preventDefault();
+
+  hideMessage("expenseMessage");
+
+
+  try {
+
+    const data = {
+
+      pumpId: currentPump.id,
+
+      pumpName: currentPump.name,
+
+      pumpCompany: currentPump.company,
+
+      date: $("expenseDate").value,
+
+      description:
+        $("expenseDescription").value,
+
+      amount:
+        Number($("expenseAmount").value || 0),
+
+      staffId:
+        auth.currentUser.uid,
+
+      staffName:
+        profile.name || auth.currentUser.email,
+
+      createdAt:
+        new Date().toISOString()
+
+    };
+
+
+    await addDoc(
+      collection(db, "expenses"),
+      data
+    );
+
+
+    showMessage(
+      "expenseMessage",
+      "Expense saved successfully."
+    );
+
+
+    $("expenseForm").reset();
+
+    $("expenseDate").value = today();
+
+    await loadData();
+
+  } catch(error) {
+
+    console.error(error);
+
+    showMessage(
+      "expenseMessage",
+      error.message
+    );
+
+  }
+
+});
+
+
+$("loginForm").addEventListener("submit", async function(event) {
+
+  event.preventDefault();
+
+  hideMessage("loginMessage");
+
+
+  try {
+
+    await signInWithEmailAndPassword(
+      auth,
+      $("loginEmail").value.trim(),
+      $("loginPassword").value
+    );
+
+  } catch(error) {
+
+    console.error(error);
+
+    showMessage(
+      "loginMessage",
+      error.message
+    );
+
+  }
+
+});
+
+
+window.logout = async function() {
+
+  await signOut(auth);
+
+};
+
+
+onAuthStateChanged(auth, async function(user) {
+
+  if (!user) {
+
+    $("loginPage").classList.remove("hidden");
+    $("app").classList.add("hidden");
+
+    return;
+  }
+
+
+  try {
+
+    await loadProfile();
+
+    await loadPumps();
+
+    $("userInfo").textContent =
+      profile.name + " • " + profile.role;
+
+    if (profile.role !== "owner") {
+      $("usersNav").classList.add("hidden");
+    } else {
+      $("usersNav").classList.remove("hidden");
+    }
+
+    $("loginPage").classList.add("hidden");
+    $("app").classList.remove("hidden");
+
+    await loadData();
+
+    showPage("dashboard");
+
+  } catch(error) {
+
+    console.error(error);
+
+    await signOut(auth);
+
+    showMessage(
+      "loginMessage",
+      error.message
+    );
+
+  }
+
+});
+
 </script>
+
 </body>
 </html>
