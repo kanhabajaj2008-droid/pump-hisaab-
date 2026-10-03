@@ -1,9 +1,10 @@
 {
-  "name":"Pump Manager",
-  "short_name":"Pump Manager",
+  "name":"Pump Hisaab V2",
+  "short_name":"Pump Hisaab",
   "start_url":"./",
   "display":"standalone",
-  "background_color":"#f3f4f6",
-  "theme_color":"#111827",
+  "background_color":"#f5f7fb",
+  "theme_color":"#0b1220",
+  "description":"Petrol pump management system",
   "icons":[]
 }

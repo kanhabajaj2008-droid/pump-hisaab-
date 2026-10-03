@@ -1,0 +1,69 @@
+// Firestore rules for Pump Hisaab V2
+// Publish these in Firebase Console -> Firestore Database -> Rules.
+// Test them before using the app with real financial data.
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function myUser() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
+    function isOwner() {
+      return signedIn() && myUser().role == "owner" && myUser().active != false;
+    }
+
+    function isActive() {
+      return signedIn() && myUser().active != false;
+    }
+
+    function hasPumpAccess(pumpId) {
+      return isOwner() || (myUser().pumpAccess != null && pumpId in myUser().pumpAccess);
+    }
+
+    match /users/{uid} {
+      allow read: if isOwner() || (signedIn() && request.auth.uid == uid);
+      allow create, update, delete: if isOwner();
+    }
+
+    match /pumps/{pumpId} {
+      // Staff can read assigned pumps. ONLY owner can write pump settings,
+      // including petrolPrice and dieselPrice.
+      allow read: if isActive() && hasPumpAccess(pumpId);
+      allow create, delete: if isOwner();
+      allow update: if isOwner();
+    }
+
+    match /shifts/{shiftId} {
+      allow read: if isActive() && hasPumpAccess(resource.data.pumpId);
+      allow create: if isActive() && hasPumpAccess(request.resource.data.pumpId)
+                    && request.resource.data.staffId == request.auth.uid;
+      allow update, delete: if isOwner() && hasPumpAccess(resource.data.pumpId);
+    }
+
+    match /expenses/{expenseId} {
+      allow read: if isActive() && hasPumpAccess(resource.data.pumpId);
+      allow create: if isActive() && hasPumpAccess(request.resource.data.pumpId)
+                    && request.resource.data.staffId == request.auth.uid;
+      allow update, delete: if isOwner() && hasPumpAccess(resource.data.pumpId);
+    }
+
+    match /stock/{stockId} {
+      allow read: if isActive() && hasPumpAccess(resource.data.pumpId);
+      allow create: if isActive() && hasPumpAccess(request.resource.data.pumpId)
+                    && request.resource.data.staffId == request.auth.uid;
+      allow update, delete: if isOwner() && hasPumpAccess(resource.data.pumpId);
+    }
+
+    match /price_history/{historyId} {
+      allow read: if isActive() && hasPumpAccess(resource.data.pumpId);
+      allow create: if isOwner() && hasPumpAccess(request.resource.data.pumpId);
+      allow update, delete: if isOwner() && hasPumpAccess(resource.data.pumpId);
+    }
+  }
+}

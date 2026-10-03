@@ -1,32 +1,25 @@
-# Pump Manager — Firebase Edition
+# Pump Hisaab V2
 
-This version uses Firebase Authentication + Cloud Firestore.
+This is the upgraded frontend for the existing Pump Manager Firebase project.
 
-## Firebase data expected
+## Existing Firebase data
+- `users/{firebaseUid}`: owner/staff profiles
+- `pumps/AKSHAT`
+- `pumps/PRAGATI`
 
-Root collections:
-- `pumps`
-- `users`
+## New V2 collections
 - `shifts`
 - `expenses`
-- `audit_logs`
-- `settings` (optional for future features)
+- `stock`
+- `price_history`
 
-Pump documents:
-- `AKSHAT`: code=AKSHAT, name=Akshat Filling Station, company=BPCL, active=true
-- `PRAGATI`: code=PRAGATI, name=Pragati Filling Station, company=HPCL, active=true
+## Fuel price control
+The Owner can save Petrol and Diesel prices from **Prices**.
+Staff can only read them. The provided `FIRESTORE_RULES.txt` is designed to enforce this at Firebase level.
 
-User documents use the Firebase Authentication UID as the document ID:
-- Owner: role=`owner`, pumpAccess=`["AKSHAT","PRAGATI"]`, active=true
-- Staff: role=`staff`, pumpAccess=`["AKSHAT"]` or `["PRAGATI"]`, active=true
-
-## Connect the app
-Open `js/config.js` and paste the Firebase Web App config from:
-Firebase Console → Project settings → Your apps → Web app → SDK setup and configuration.
-
-Do NOT put service-account private keys or Admin SDK credentials in this frontend.
+When a shift is saved, the current owner-set prices are copied into the shift (`petrolRate`, `dieselRate`) so historical entries keep the price that was actually used.
 
 ## Important
-The Firestore security rules must be configured in Firebase Console. The app expects fields named in camelCase such as `pumpId`, `staffId`, and `createdAt`.
+Before using the app with real business data, publish and test `FIRESTORE_RULES.txt` in Firebase Console.
 
-For production, test the rules with Firebase's Rules Playground/Emulator before relying on them for sensitive business operations.
+The app uses the Firebase Web SDK configuration already present in `js/config.js`.
