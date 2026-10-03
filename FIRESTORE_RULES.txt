@@ -1,69 +1,38 @@
-// Firestore rules for Pump Hisaab V2
-// Publish these in Firebase Console -> Firestore Database -> Rules.
-// Test them before using the app with real financial data.
-
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-
-    function signedIn() {
-      return request.auth != null;
-    }
-
-    function myUser() {
-      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
-    }
-
-    function isOwner() {
-      return signedIn() && myUser().role == "owner" && myUser().active != false;
-    }
-
-    function isActive() {
-      return signedIn() && myUser().active != false;
-    }
-
-    function hasPumpAccess(pumpId) {
-      return isOwner() || (myUser().pumpAccess != null && pumpId in myUser().pumpAccess);
+    function signedIn() { return request.auth != null; }
+    function me() { return get(/databases/$(database)/documents/users/$(request.auth.uid)).data; }
+    function owner() { return signedIn() && me().role == 'owner' && me().active == true; }
+    function staffOrOwner() { return signedIn() && me().active == true; }
+    function canAccessPump(pumpId) {
+      return owner() || (pumpId in me().pumpAccess);
     }
 
     match /users/{uid} {
-      allow read: if isOwner() || (signedIn() && request.auth.uid == uid);
-      allow create, update, delete: if isOwner();
+      allow read: if signedIn() && (request.auth.uid == uid || owner());
+      allow create: if owner();
+      allow update: if owner();
+      allow delete: if owner();
     }
 
     match /pumps/{pumpId} {
-      // Staff can read assigned pumps. ONLY owner can write pump settings,
-      // including petrolPrice and dieselPrice.
-      allow read: if isActive() && hasPumpAccess(pumpId);
-      allow create, delete: if isOwner();
-      allow update: if isOwner();
+      allow read: if signedIn() && canAccessPump(pumpId);
+      allow write: if owner();
     }
 
-    match /shifts/{shiftId} {
-      allow read: if isActive() && hasPumpAccess(resource.data.pumpId);
-      allow create: if isActive() && hasPumpAccess(request.resource.data.pumpId)
-                    && request.resource.data.staffId == request.auth.uid;
-      allow update, delete: if isOwner() && hasPumpAccess(resource.data.pumpId);
+    match /fuelPrices/{pumpId} {
+      allow read: if signedIn() && canAccessPump(pumpId);
+      allow create, update, delete: if owner() && canAccessPump(pumpId);
     }
 
-    match /expenses/{expenseId} {
-      allow read: if isActive() && hasPumpAccess(resource.data.pumpId);
-      allow create: if isActive() && hasPumpAccess(request.resource.data.pumpId)
-                    && request.resource.data.staffId == request.auth.uid;
-      allow update, delete: if isOwner() && hasPumpAccess(resource.data.pumpId);
+    match /dailyShifts/{shiftId} {
+      allow read: if signedIn() && canAccessPump(resource.data.pumpId);
+      allow create: if staffOrOwner() && canAccessPump(request.resource.data.pumpId) && request.resource.data.createdBy == request.auth.uid;
+      allow update: if signedIn() && canAccessPump(resource.data.pumpId) && (owner() || resource.data.createdBy == request.auth.uid);
+      allow delete: if owner();
     }
 
-    match /stock/{stockId} {
-      allow read: if isActive() && hasPumpAccess(resource.data.pumpId);
-      allow create: if isActive() && hasPumpAccess(request.resource.data.pumpId)
-                    && request.resource.data.staffId == request.auth.uid;
-      allow update, delete: if isOwner() && hasPumpAccess(resource.data.pumpId);
-    }
-
-    match /price_history/{historyId} {
-      allow read: if isActive() && hasPumpAccess(resource.data.pumpId);
-      allow create: if isOwner() && hasPumpAccess(request.resource.data.pumpId);
-      allow update, delete: if isOwner() && hasPumpAccess(resource.data.pumpId);
-    }
+    match /{document=**} { allow read, write: if false; }
   }
 }

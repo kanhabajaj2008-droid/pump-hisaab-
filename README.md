@@ -1,25 +1,15 @@
 # Pump Hisaab V2
 
-This is the upgraded frontend for the existing Pump Manager Firebase project.
+Tailored for petrol pump operations:
+- Full Day Shift
+- Machine 1, Machine 2, etc.
+- 2 Petrol + 2 Diesel nozzles per machine
+- Any unused nozzle can remain completely blank
+- Any unused machine can remain blank
+- Opening/closing readings calculate litres automatically
+- Owner-controlled Petrol/Diesel prices
+- Staff can view prices but cannot edit them
+- Daily Hisaab saved to Firestore per pump
+- Mobile-friendly PWA
 
-## Existing Firebase data
-- `users/{firebaseUid}`: owner/staff profiles
-- `pumps/AKSHAT`
-- `pumps/PRAGATI`
-
-## New V2 collections
-- `shifts`
-- `expenses`
-- `stock`
-- `price_history`
-
-## Fuel price control
-The Owner can save Petrol and Diesel prices from **Prices**.
-Staff can only read them. The provided `FIRESTORE_RULES.txt` is designed to enforce this at Firebase level.
-
-When a shift is saved, the current owner-set prices are copied into the shift (`petrolRate`, `dieselRate`) so historical entries keep the price that was actually used.
-
-## Important
-Before using the app with real business data, publish and test `FIRESTORE_RULES.txt` in Firebase Console.
-
-The app uses the Firebase Web SDK configuration already present in `js/config.js`.
+GitHub Pages: upload the files in this folder to the repository root. Keep `js/config.js` with the Firebase configuration.
