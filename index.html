@@ -14,4 +14,4 @@ if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then
 if('caches' in window){caches.keys().then(ks=>ks.filter(k=>/pump|hisaab/i.test(k)).forEach(k=>caches.delete(k))).catch(()=>{});}
 window.addEventListener('error',function(e){var b=document.getElementById('boot');if(b)b.textContent='App error: '+(e.message||'Unknown error');});
 window.addEventListener('unhandledrejection',function(e){var b=document.getElementById('boot');if(b)b.textContent='App error: '+(e.reason?.message||e.reason||'Unknown error');});
-</script><script type="module" src="./js/app.js?v=20261004"></script></body></html>
+</script><script type="module" src="./js/app.js?v=20261004fix2"></script></body></html>
