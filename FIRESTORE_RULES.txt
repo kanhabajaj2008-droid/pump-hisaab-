@@ -1,16 +1,12 @@
-rules_version = '2';
-service cloud.firestore {
- match /databases/{database}/documents {
-  function signedIn(){return request.auth!=null;}
-  function me(){return get(/databases/$(database)/documents/users/$(request.auth.uid));}
-  function active(){return signedIn()&&exists(/databases/$(database)/documents/users/$(request.auth.uid))&&me().data.active==true;}
-  function owner(){return active()&&me().data.role=='owner';}
-  match /users/{uid}{allow read:if active();allow create,update,delete:if owner();}
-  match /pumps/{id}{allow read:if active();allow create,update,delete:if owner();}
-  match /fuelPrices/{id}{allow read:if active();allow create,update,delete:if owner();}
-  match /dailyShifts/{id}{allow read:if active();allow create:if active()&&request.resource.data.createdBy==request.auth.uid;allow update:if active()&&(owner()||resource.data.createdBy==request.auth.uid);allow delete:if owner();}
-  match /expenses/{id}{allow read:if active();allow create:if active()&&request.resource.data.createdBy==request.auth.uid;allow update:if active()&&(owner()||resource.data.createdBy==request.auth.uid);allow delete:if owner();}
-  match /stockEntries/{id}{allow read:if active();allow create,update:if active();allow delete:if owner();}
-  match /{document=**}{allow read,write:if false;}
- }
-}
+rules_version='2';
+service cloud.firestore { match /databases/{database}/documents {
+ function signed(){return request.auth!=null;} function me(){return get(/databases/$(database)/documents/users/$(request.auth.uid));}
+ function active(){return signed()&&exists(/databases/$(database)/documents/users/$(request.auth.uid))&&me().data.active==true;} function owner(){return active()&&me().data.role=='owner';}
+ match /users/{id}{allow read:if active();allow write:if owner();}
+ match /pumps/{id}{allow read:if active();allow write:if owner();}
+ match /fuelPrices/{id}{allow read:if active();allow write:if owner();}
+ match /fuelPriceHistory/{id}{allow read:if active();allow write:if owner();}
+ match /dailyHisaab/{id}{allow read:if active();allow create:if active()&&request.resource.data.createdBy==request.auth.uid;allow update:if owner()||(active()&&resource.data.createdBy==request.auth.uid);allow delete:if owner();}
+ match /auditLogs/{id}{allow read:if owner();allow create:if active();}
+ match /{document=**}{allow read,write:if false;}
+}}
