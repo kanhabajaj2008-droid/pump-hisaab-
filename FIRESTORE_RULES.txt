@@ -1,15 +1,33 @@
 rules_version = '2';
 service cloud.firestore {
- match /databases/{database}/documents {
-  function signed(){return request.auth!=null;}
-  function u(){return get(/databases/$(database)/documents/users/$(request.auth.uid));}
-  function active(){return signed() && exists(/databases/$(database)/documents/users/$(request.auth.uid)) && u().data.active==true;}
-  function owner(){return active() && u().data.role=='owner';}
-  match /users/{id}{allow read:if active();allow write:if owner();}
-  match /pumps/{id}{allow read:if active();allow write:if owner();}
-  match /fuelPrices/{id}{allow read:if active();allow write:if owner();}
-  match /fuelPriceHistory/{id}{allow read:if active();allow create:if owner();}
-  match /dailyHisaab/{id}{allow read:if active();allow create:if active() && request.resource.data.createdBy==request.auth.uid;allow update:if owner() || (active() && resource.data.createdBy==request.auth.uid);allow delete:if owner();}
-  match /auditLogs/{id}{allow read:if owner();allow create:if active() && request.resource.data.userId==request.auth.uid;}
- }
+  match /databases/{database}/documents {
+    function signed(){ return request.auth != null; }
+    function me(){ return get(/databases/$(database)/documents/users/$(request.auth.uid)); }
+    function active(){ return signed() && exists(/databases/$(database)/documents/users/$(request.auth.uid)) && me().data.active == true; }
+    function owner(){ return active() && me().data.role == 'owner'; }
+    function canPump(p){ return active() && (me().data.role == 'owner' || p in me().data.pumpAccess); }
+
+    match /users/{id}{ allow read: if active(); allow create,update,delete: if owner(); }
+    match /pumps/{id}{ allow read: if active(); allow create,update,delete: if owner(); }
+    match /fuelPrices/{id}{ allow read: if active(); allow create,update,delete: if owner(); }
+    match /fuelPriceHistory/{id}{ allow read: if active(); allow create: if owner(); }
+
+    match /dailyHisaab/{id}{
+      allow read: if active();
+      allow create: if canPump(request.resource.data.pumpId) && request.resource.data.createdBy == request.auth.uid;
+      allow update: if canPump(resource.data.pumpId) && (owner() || resource.data.createdBy == request.auth.uid);
+      allow delete: if owner();
+    }
+    match /stockEntries/{id}{
+      allow read: if active();
+      allow create: if canPump(request.resource.data.pumpId) && request.resource.data.createdBy == request.auth.uid;
+      allow update: if canPump(resource.data.pumpId) && (owner() || resource.data.createdBy == request.auth.uid);
+      allow delete: if owner();
+    }
+    match /auditLogs/{id}{
+      allow read: if owner();
+      allow create: if active() && request.resource.data.userId == request.auth.uid;
+    }
+    match /{document=**}{ allow read,write: if false; }
+  }
 }
